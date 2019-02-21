@@ -44,4 +44,19 @@ app.post("/api/posts", (req, res, next) => {
 
 });
 
+
+app.get("/api/posts", (req, res, next) => {
+    Post.find()
+    .then((result)=>{
+        res.status(200).json({
+            posts: result
+        });
+    })
+    .catch((err)=>{
+        console.log(`Error while fetching Posts ${err}`);
+    })
+    
+
+});
+
 module.exports = app;
