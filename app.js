@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const Post = require("./models/Post");
+const PostRoutes = require('./routes/PostRoutes');
 const app = express();
 
 
@@ -19,44 +19,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     next();
 });
 
-app.post("/api/posts", (req, res, next) => {
-    const post = new Post({
-        title: req.body.title,
-        post: req.body.post
-    });
-
-    post.save()
-        .then((result) => {
-            res.status(200).json({
-                msg: 1,
-                posts: post
-            })
-        })
-        .catch((err) => {
-            res.status(422).json({
-                error: err
-            });
-        });
-
-});
-
-
-app.get("/api/posts", (req, res, next) => {
-    Post.find()
-    .then((result)=>{
-        res.status(200).json({
-            posts: result
-        });
-    })
-    .catch((err)=>{
-        console.log(`Error while fetching Posts ${err}`);
-    })
-    
-
-});
+app.use("/api/posts",PostRoutes);
 
 module.exports = app;
