@@ -1,12 +1,38 @@
 const express = require('express');
 const Post = require("../models/Post");
 const app = express.Router();
+const multer = require('multer');
+
+const GET_EXT = {
+    'image/png': 'png',
+    'image/jpeg': 'jpg',
+    'image/jpg': 'jpg'
+};
+
+let img="";
+const config = multer.diskStorage({
+    destination: (req, file, cb) => {
+        let error = "";
+        if(!(GET_EXT[file.mimetype]))
+             error = new Error("Image not detected");
+        
+        cb(error, 'images');
+    },
+    filename: (req, file, cb) => {
+        const filename = file.originalname.split(".");
+        const ext = GET_EXT[file.mimetype];
+        img = filename[0] + Date.now() + "."+ ext;
+        cb(null, img);
+    }
+});
 
 
-app.post("", (req, res, next) => {
+
+app.post("", multer({ storage: config }).single('image'), (req, res, next) => {
     const post = new Post({
         title: req.body.title,
-        post: req.body.post
+        post: req.body.post,
+        image: img
     });
 
     post.save()
