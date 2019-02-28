@@ -15,6 +15,7 @@ mongoose.connect("mongodb://localhost:27017/posts", { useNewUrlParser: true })
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(express.static("images" , "/images/" ));
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");

@@ -29,17 +29,20 @@ const config = multer.diskStorage({
 
 
 app.post("", multer({ storage: config }).single('image'), (req, res, next) => {
+    const protocol = req.protocol;
+    const url = req.get('host');
     const post = new Post({
         title: req.body.title,
         post: req.body.post,
-        image: img
+        image: protocol + "://" + url  + "/images/" + req.file.filename
     });
 
     post.save()
         .then((result) => {
             res.status(200).json({
                 msg: 1,
-                posts: post
+                posts: post,
+                url: url
             })
         })
         .catch((err) => {
@@ -80,10 +83,18 @@ app.delete("/:id", (req, res, next) => {
         });
 });
 
-app.put("/:id", (req, res, next) => {
+app.put("/:id", multer({ storage: config }).single('image'), (req, res, next) => {
+    let imageUrl = req.body.image;
+    console.log(req.file);
+    if(req.file){
+        const protocol = req.protocol;
+        const url = req.get('host');
+        imageUrl = protocol + "://" + url + "/images/" + req.file.filename;
+    }
     let post = {
         title: req.body.title,
-        post: req.body.post
+        post: req.body.post,
+        image: imageUrl
     };
     Post.updateOne({ _id: req.params.id }, post)
         .then((result) => {
