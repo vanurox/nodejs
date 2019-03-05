@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const app = express.Router();
 
 
-app.post("", (req, res, next) => {
+app.post("/signup", (req, res, next) => {
 
 
     
