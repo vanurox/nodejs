@@ -2,6 +2,7 @@ const express = require('express');
 const Post = require("../models/Post");
 const app = express.Router();
 const multer = require('multer');
+const AuthenticateRequest = require('../middlewares/Authenticate');
 
 const GET_EXT = {
     'image/png': 'png',
@@ -9,32 +10,32 @@ const GET_EXT = {
     'image/jpg': 'jpg'
 };
 
-let img="";
+let img = "";
 const config = multer.diskStorage({
     destination: (req, file, cb) => {
         let error = "";
-        if(!(GET_EXT[file.mimetype]))
-             error = new Error("Image not detected");
-        
+        if (!(GET_EXT[file.mimetype]))
+            error = new Error("Image not detected");
+
         cb(error, 'images');
     },
     filename: (req, file, cb) => {
         const filename = file.originalname.split(".");
         const ext = GET_EXT[file.mimetype];
-        img = filename[0] + Date.now() + "."+ ext;
+        img = filename[0] + Date.now() + "." + ext;
         cb(null, img);
     }
 });
 
 
 
-app.post("", multer({ storage: config }).single('image'), (req, res, next) => {
+app.post("", AuthenticateRequest, multer({ storage: config }).single('image'), (req, res, next) => {
     const protocol = req.protocol;
     const url = req.get('host');
     const post = new Post({
         title: req.body.title,
         post: req.body.post,
-        image: protocol + "://" + url  + "/images/" + req.file.filename
+        image: protocol + "://" + url + "/images/" + req.file.filename
     });
 
     post.save()
@@ -68,7 +69,7 @@ app.get("", (req, res, next) => {
 
 });
 
-app.delete("/:id", (req, res, next) => {
+app.delete("/:id", AuthenticateRequest, (req, res, next) => {
     Post.deleteOne({ _id: req.params.id })
         .then((result) => {
             res.status(200).json({
@@ -83,10 +84,10 @@ app.delete("/:id", (req, res, next) => {
         });
 });
 
-app.put("/:id", multer({ storage: config }).single('image'), (req, res, next) => {
+app.put("/:id", AuthenticateRequest, multer({ storage: config }).single('image'), (req, res, next) => {
     let imageUrl = req.body.image;
     console.log(req.file);
-    if(req.file){
+    if (req.file) {
         const protocol = req.protocol;
         const url = req.get('host');
         imageUrl = protocol + "://" + url + "/images/" + req.file.filename;

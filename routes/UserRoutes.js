@@ -8,9 +8,6 @@ const app = express.Router();
 
 app.post("/signup", (req, res, next) => {
 
-
-
-
     bcrypt.hash(req.body.password, 10, (err, hash) => {
         let user = new User({
             email: req.body.email,
