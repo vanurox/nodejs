@@ -11,9 +11,10 @@ const GET_EXT = {
 };
 
 let img = "";
+let error;
 const config = multer.diskStorage({
     destination: (req, file, cb) => {
-        let error = "";
+        let erAuthenticateRequestr = "";
         if (!(GET_EXT[file.mimetype]))
             error = new Error("Image not detected");
 
@@ -35,7 +36,8 @@ app.post("", AuthenticateRequest, multer({ storage: config }).single('image'), (
     const post = new Post({
         title: req.body.title,
         post: req.body.post,
-        image: protocol + "://" + url + "/images/" + req.file.filename
+        image: protocol + "://" + url + "/images/" + req.file.filename,
+        userId: req.userInfo.userId
     });
 
     post.save()
